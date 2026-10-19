@@ -1,0 +1,817 @@
+--[[
+    ═══════════════════════════════════════════════════════════
+      VERIFIED SCRIPT - BY MARKBLOX
+      UI Style: SHADES (Advanced Dark & Elegant)
+    ═══════════════════════════════════════════════════════════
+]]
+
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+
+local LP = Players.LocalPlayer
+local PlayerGui = LP:WaitForChild("PlayerGui")
+local Camera = workspace.CurrentCamera
+local IsMobile = UIS.TouchEnabled and not UIS.KeyboardEnabled
+
+-- ═══════════════════════════════════
+-- KONFIGURASI LINK WA LU
+-- ═══════════════════════════════════
+local WA_LINK = "https://whatsapp.com/channel/0029VbDpa5u0bIdodYpuUA3T"
+
+-- ═══════════════════════════════════
+-- CLEANUP
+-- ═══════════════════════════════════
+if PlayerGui:FindFirstChild("VerifiedUI") then
+    PlayerGui.VerifiedUI:Destroy()
+end
+pcall(function()
+    if CoreGui:FindFirstChild("VerifiedUI") then
+        CoreGui.VerifiedUI:Destroy()
+    end
+end)
+
+-- ═══════════════════════════════════
+-- THEME
+-- ═══════════════════════════════════
+local TH = {
+    Bg = Color3.fromRGB(10, 10, 14),
+    Panel = Color3.fromRGB(18, 18, 24),
+    Card = Color3.fromRGB(26, 26, 34),
+    CardH = Color3.fromRGB(36, 36, 46),
+    Accent = Color3.fromRGB(255, 180, 60),
+    AccDim = Color3.fromRGB(180, 120, 40),
+    Text = Color3.fromRGB(240, 235, 225),
+    TextDim = Color3.fromRGB(130, 125, 115),
+    TextAct = Color3.fromRGB(10, 10, 14),
+    TOn = Color3.fromRGB(255, 180, 60),
+    TOff = Color3.fromRGB(45, 45, 52),
+    KOn = Color3.fromRGB(10, 10, 14),
+    KOff = Color3.fromRGB(120, 115, 105),
+    Border = Color3.fromRGB(50, 48, 42),
+    Good = Color3.fromRGB(100, 255, 140),
+    Bad = Color3.fromRGB(255, 70, 70),
+}
+
+-- ═══════════════════════════════════
+-- HELPERS
+-- ═══════════════════════════════════
+local function TW(obj, props, dur, style)
+    TweenService:Create(obj, TweenInfo.new(dur or 0.3, style or Enum.EasingStyle.Quad), props):Play()
+end
+
+local function Corner(p, r)
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, r or 8)
+    c.Parent = p
+    return c
+end
+
+local function Stroke(p, th, col, tr)
+    local s = Instance.new("UIStroke")
+    s.Thickness = th or 1
+    s.Color = col or TH.Border
+    s.Transparency = tr or 0.5
+    s.Parent = p
+    return s
+end
+
+-- ═══════════════════════════════════
+-- GUI SETUP
+-- ═══════════════════════════════════
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "VerifiedUI"
+Gui.ResetOnSpawn = false
+Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+Gui.DisplayOrder = 1000
+Gui.IgnoreGuiInset = true
+Gui.Parent = PlayerGui
+
+-- ═══════════════════════════════════
+-- NOTIFICATION SYSTEM
+-- ═══════════════════════════════════
+local NotifBox = Instance.new("Frame")
+NotifBox.Size = UDim2.new(0, 240, 1, -20)
+NotifBox.Position = UDim2.new(1, -250, 0, 10)
+NotifBox.BackgroundTransparency = 1
+NotifBox.Parent = Gui
+
+local NL = Instance.new("UIListLayout")
+NL.SortOrder = Enum.SortOrder.LayoutOrder
+NL.Padding = UDim.new(0, 4)
+NL.VerticalAlignment = Enum.VerticalAlignment.Bottom
+NL.Parent = NotifBox
+
+local nOrd = 0
+local function Notify(title, msg, dur, col)
+    dur = dur or 3
+    col = col or TH.Accent
+    nOrd = nOrd + 1
+
+    local f = Instance.new("Frame")
+    f.Size = UDim2.new(1, 0, 0, 0)
+    f.BackgroundColor3 = TH.Bg
+    f.BackgroundTransparency = 0.05
+    f.BorderSizePixel = 0
+    f.ClipsDescendants = true
+    f.LayoutOrder = nOrd
+    f.Parent = NotifBox
+    Corner(f, 8)
+    Stroke(f, 1, col, 0.4)
+
+    local bar = Instance.new("Frame")
+    bar.Size = UDim2.new(0, 3, 1, 0)
+    bar.BackgroundColor3 = col
+    bar.BorderSizePixel = 0
+    bar.Parent = f
+
+    local tl = Instance.new("TextLabel")
+    tl.Size = UDim2.new(1, -14, 0, 15)
+    tl.Position = UDim2.new(0, 11, 0, 5)
+    tl.BackgroundTransparency = 1
+    tl.Text = title
+    tl.Font = Enum.Font.GothamBold
+    tl.TextSize = 11
+    tl.TextColor3 = col
+    tl.TextXAlignment = Enum.TextXAlignment.Left
+    tl.Parent = f
+
+    local ml = Instance.new("TextLabel")
+    ml.Size = UDim2.new(1, -14, 0, 13)
+    ml.Position = UDim2.new(0, 11, 0, 22)
+    ml.BackgroundTransparency = 1
+    ml.Text = msg or ""
+    ml.Font = Enum.Font.Gotham
+    ml.TextSize = 9
+    ml.TextColor3 = TH.TextDim
+    ml.TextXAlignment = Enum.TextXAlignment.Left
+    ml.Parent = f
+
+    local prog = Instance.new("Frame")
+    prog.Size = UDim2.new(1, 0, 0, 2)
+    prog.Position = UDim2.new(0, 0, 1, -2)
+    prog.BackgroundColor3 = col
+    prog.BorderSizePixel = 0
+    prog.Parent = f
+
+    TW(f, {Size = UDim2.new(1, 0, 0, 42)}, 0.3, Enum.EasingStyle.Back)
+    task.delay(0.35, function()
+        TweenService:Create(prog, TweenInfo.new(dur - 0.7, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 0, 2)}):Play()
+    end)
+    task.delay(dur, function()
+        TW(f, {Size = UDim2.new(1, 0, 0, 0)}, 0.3)
+        task.delay(0.35, function() f:Destroy() end)
+    end)
+end
+
+-- ═══════════════════════════════════
+-- RESPONSIVE SIZE
+-- ═══════════════════════════════════
+local function GetPanelSize()
+    local vp = Camera.ViewportSize
+    local w = math.clamp(math.floor(vp.X * 0.92), 250, 320)
+    local h = math.clamp(math.floor(vp.Y * 0.80), 280, 600)
+    return w, h
+end
+
+local W, H = GetPanelSize()
+
+-- ═══════════════════════════════════
+-- MAIN PANEL
+-- ═══════════════════════════════════
+local Main = Instance.new("Frame")
+Main.Name = "Main"
+Main.Size = UDim2.new(0, W, 0, H)
+Main.Position = UDim2.new(0.5, -W/2, 0.5, -H/2)
+Main.BackgroundColor3 = TH.Bg
+Main.BackgroundTransparency = 0.02
+Main.BorderSizePixel = 0
+Main.ClipsDescendants = true
+Main.Active = true
+Main.Parent = Gui
+Corner(Main, 14)
+Stroke(Main, 1, TH.Border, 0.3)
+
+-- Top glow
+local topGlow = Instance.new("Frame")
+topGlow.Size = UDim2.new(1, -28, 0, 2)
+topGlow.Position = UDim2.new(0, 14, 0, 0)
+topGlow.BackgroundColor3 = TH.Accent
+topGlow.BackgroundTransparency = 0.2
+topGlow.BorderSizePixel = 0
+topGlow.ZIndex = 5
+topGlow.Parent = Main
+
+-- ═══════════════════════════════════
+-- TITLE BAR
+-- ═══════════════════════════════════
+local TBar = Instance.new("Frame")
+TBar.Size = UDim2.new(1, 0, 0, 48)
+TBar.BackgroundColor3 = TH.Panel
+TBar.BackgroundTransparency = 0.15
+TBar.BorderSizePixel = 0
+TBar.Active = true
+TBar.ZIndex = 3
+TBar.Parent = Main
+
+local tBarBtm = Instance.new("Frame")
+tBarBtm.Size = UDim2.new(1, 0, 0, 14)
+tBarBtm.Position = UDim2.new(0, 0, 1, -14)
+tBarBtm.BackgroundColor3 = TH.Panel
+tBarBtm.BackgroundTransparency = 0.15
+tBarBtm.BorderSizePixel = 0
+tBarBtm.ZIndex = 3
+tBarBtm.Parent = TBar
+
+local TTxt = Instance.new("TextLabel")
+TTxt.Size = UDim2.new(1, -90, 1, 0)
+TTxt.Position = UDim2.new(0, 14, 0, 0)
+TTxt.BackgroundTransparency = 1
+TTxt.Text = "☠️ Verified Script - By Markblox"
+TTxt.Font = Enum.Font.GothamBlack
+TTxt.TextSize = 13
+TTxt.TextColor3 = TH.Accent
+TTxt.TextXAlignment = Enum.TextXAlignment.Left
+TTxt.ZIndex = 4
+TTxt.Parent = TBar
+
+-- ═══════════════════════════════════
+-- DRAGGING
+-- ═══════════════════════════════════
+local dg, ds, dp = false, nil, nil
+local dragInput
+
+TBar.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+        dg = true; ds = i.Position; dp = Main.Position; dragInput = i
+    end
+end)
+
+TBar.InputChanged:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch then
+        dragInput = i
+    end
+end)
+
+UIS.InputChanged:Connect(function(i)
+    if dg and dragInput and i == dragInput then
+        local d = i.Position - ds
+        Main.Position = UDim2.new(dp.X.Scale, dp.X.Offset + d.X, dp.Y.Scale, dp.Y.Offset + d.Y)
+    end
+end)
+
+UIS.InputEnded:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+        dg = false; dragInput = nil
+    end
+end)
+
+-- Minimize button
+local panelMin = false
+local MinB = Instance.new("TextButton")
+MinB.Size = UDim2.new(0, 26, 0, 26)
+MinB.Position = UDim2.new(1, -64, 0.5, -13)
+MinB.BackgroundColor3 = TH.Card
+MinB.BorderSizePixel = 0
+MinB.Text = "—"
+MinB.Font = Enum.Font.GothamBold
+MinB.TextSize = 14
+MinB.TextColor3 = TH.TextDim
+MinB.AutoButtonColor = false
+MinB.ZIndex = 4
+MinB.Parent = TBar
+Corner(MinB, 6)
+
+-- Close button
+local ClsB = Instance.new("TextButton")
+ClsB.Size = UDim2.new(0, 26, 0, 26)
+ClsB.Position = UDim2.new(1, -34, 0.5, -13)
+ClsB.BackgroundColor3 = Color3.fromRGB(190, 50, 50)
+ClsB.BorderSizePixel = 0
+ClsB.Text = "✕"
+ClsB.Font = Enum.Font.GothamBold
+ClsB.TextSize = 11
+ClsB.TextColor3 = Color3.fromRGB(255, 255, 255)
+ClsB.AutoButtonColor = false
+ClsB.ZIndex = 4
+ClsB.Parent = TBar
+Corner(ClsB, 6)
+
+-- Separator
+local sep = Instance.new("Frame")
+sep.Size = UDim2.new(1, -20, 0, 1)
+sep.Position = UDim2.new(0, 10, 1, -1)
+sep.BackgroundColor3 = TH.Border
+sep.BackgroundTransparency = 0.5
+sep.BorderSizePixel = 0
+sep.ZIndex = 4
+sep.Parent = TBar
+
+-- ═══════════════════════════════════
+-- TAB SYSTEM
+-- ═══════════════════════════════════
+local TabFrame = Instance.new("Frame")
+TabFrame.Size = UDim2.new(1, -12, 0, 30)
+TabFrame.Position = UDim2.new(0, 6, 0, 50)
+TabFrame.BackgroundTransparency = 1
+TabFrame.ZIndex = 3
+TabFrame.Parent = Main
+
+local TabLay = Instance.new("UIListLayout")
+TabLay.FillDirection = Enum.FillDirection.Horizontal
+TabLay.Padding = UDim.new(0, 3)
+TabLay.Parent = TabFrame
+
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(1, 0, 1, -84)
+Content.Position = UDim2.new(0, 0, 0, 84)
+Content.BackgroundTransparency = 1
+Content.ClipsDescendants = true
+Content.Parent = Main
+
+local Pages = {}
+local TabBtns = {}
+local ActiveTab = nil
+
+local function MakePage(name)
+    local sc = Instance.new("ScrollingFrame")
+    sc.Name = name
+    sc.Size = UDim2.new(1, -6, 1, -2)
+    sc.Position = UDim2.new(0, 3, 0, 1)
+    sc.BackgroundTransparency = 1
+    sc.BorderSizePixel = 0
+    sc.ScrollBarThickness = 6
+    sc.ScrollBarImageColor3 = TH.AccDim
+    sc.ScrollBarImageTransparency = 0.3
+    sc.ScrollingEnabled = true
+    sc.Active = true
+    sc.ElasticBehavior = Enum.ElasticBehavior.WhenScrollable
+    sc.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    sc.CanvasSize = UDim2.new(0, 0, 0, 0)
+    sc.Visible = false
+    sc.Parent = Content
+
+    local lay = Instance.new("UIListLayout")
+    lay.SortOrder = Enum.SortOrder.LayoutOrder
+    lay.Padding = UDim.new(0, 4)
+    lay.Parent = sc
+
+    local pad = Instance.new("UIPadding")
+    pad.PaddingLeft = UDim.new(0, 5)
+    pad.PaddingRight = UDim.new(0, 5)
+    pad.PaddingTop = UDim.new(0, 3)
+    pad.PaddingBottom = UDim.new(0, 12)
+    pad.Parent = sc
+
+    Pages[name] = sc
+    return sc
+end
+
+local function SwitchTab(name)
+    if ActiveTab == name then return end
+    for n, p in pairs(Pages) do p.Visible = (n == name) end
+    for _, td in ipairs(TabBtns) do
+        local act = td.n == name
+        TW(td.b, {BackgroundColor3 = act and TH.Accent or TH.Card, BackgroundTransparency = act and 0 or 0.5}, 0.2)
+        TW(td.l, {TextColor3 = act and TH.TextAct or TH.TextDim}, 0.2)
+    end
+    ActiveTab = name
+end
+
+local function AddTab(emoji, name, order)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0, 70, 0, 26)
+    b.BackgroundColor3 = TH.Card
+    b.BackgroundTransparency = 0.5
+    b.BorderSizePixel = 0
+    b.Text = ""
+    b.AutoButtonColor = false
+    b.LayoutOrder = order
+    b.ZIndex = 3
+    b.Parent = TabFrame
+    Corner(b, 7)
+
+    local l = Instance.new("TextLabel")
+    l.Size = UDim2.new(1, 0, 1, 0)
+    l.BackgroundTransparency = 1
+    l.Text = emoji
+    l.Font = Enum.Font.GothamBold
+    l.TextSize = 12
+    l.TextColor3 = TH.TextDim
+    l.ZIndex = 4
+    l.Parent = b
+
+    MakePage(name)
+    table.insert(TabBtns, {b = b, l = l, n = name})
+
+    b.MouseButton1Click:Connect(function() SwitchTab(name) end)
+    b.MouseEnter:Connect(function() if ActiveTab ~= name then TW(b, {BackgroundTransparency = 0.2}, 0.12) end end)
+    b.MouseLeave:Connect(function() if ActiveTab ~= name then TW(b, {BackgroundTransparency = 0.5}, 0.12) end end)
+end
+
+AddTab("✨ Features", "Main", 1)
+AddTab("ℹ️ Info", "Info", 2)
+
+-- ═══════════════════════════════════
+-- UI BUILDERS
+-- ═══════════════════════════════════
+local function Section(parent, text, order)
+    local l = Instance.new("TextLabel")
+    l.Size = UDim2.new(1, 0, 0, 22)
+    l.BackgroundTransparency = 1
+    l.Text = "  "..text
+    l.Font = Enum.Font.GothamBold
+    l.TextSize = 10
+    l.TextColor3 = TH.AccDim
+    l.TextTransparency = 0.15
+    l.TextXAlignment = Enum.TextXAlignment.Left
+    l.LayoutOrder = order
+    l.Parent = parent
+end
+
+local function TextInput(parent, title, placeholder, order)
+    local card = Instance.new("Frame")
+    card.Size = UDim2.new(1, 0, 0, 42)
+    card.BackgroundColor3 = TH.Card
+    card.BorderSizePixel = 0
+    card.LayoutOrder = order
+    card.Parent = parent
+    Corner(card, 9)
+    local cs = Stroke(card, 1, TH.Border, 0.7)
+
+    local txt = Instance.new("TextLabel")
+    txt.Size = UDim2.new(0, 100, 1, 0)
+    txt.Position = UDim2.new(0, 12, 0, 0)
+    txt.BackgroundTransparency = 1
+    txt.Text = title
+    txt.Font = Enum.Font.GothamSemibold
+    txt.TextSize = 11
+    txt.TextColor3 = TH.Text
+    txt.TextXAlignment = Enum.TextXAlignment.Left
+    txt.Parent = card
+
+    local box = Instance.new("TextBox")
+    box.Size = UDim2.new(0, 120, 0, 26)
+    box.Position = UDim2.new(1, -132, 0.5, -13)
+    box.BackgroundColor3 = TH.TOff
+    box.TextColor3 = TH.Text
+    box.PlaceholderText = placeholder
+    box.PlaceholderColor3 = TH.TextDim
+    box.Text = ""
+    box.Font = Enum.Font.Gotham
+    box.TextSize = 11
+    box.ClearTextOnFocus = false
+    box.TextXAlignment = Enum.TextXAlignment.Left
+    box.ZIndex = 2
+    box.Parent = card
+    Corner(box, 6)
+    Stroke(box, 1, TH.Border, 0.8)
+
+    local pad = Instance.new("UIPadding")
+    pad.PaddingLeft = UDim.new(0, 8)
+    pad.Parent = box
+
+    box.Focused:Connect(function() TW(cs, {Color = TH.Accent, Transparency = 0.3}, 0.2) end)
+    box.FocusLost:Connect(function() TW(cs, {Color = TH.Border, Transparency = 0.7}, 0.2) end)
+
+    return box
+end
+
+local function Toggle(parent, text, emoji, order, fn)
+    local card = Instance.new("Frame")
+    card.Size = UDim2.new(1, 0, 0, 42)
+    card.BackgroundColor3 = TH.Card
+    card.BorderSizePixel = 0
+    card.LayoutOrder = order
+    card.Parent = parent
+    Corner(card, 9)
+    local cs = Stroke(card, 1, TH.Border, 0.7)
+
+    local emo = Instance.new("TextLabel")
+    emo.Size = UDim2.new(0, 24, 1, 0)
+    emo.Position = UDim2.new(0, 8, 0, 0)
+    emo.BackgroundTransparency = 1
+    emo.Text = emoji
+    emo.TextSize = 15
+    emo.Font = Enum.Font.SourceSans
+    emo.Parent = card
+
+    local txt = Instance.new("TextLabel")
+    txt.Size = UDim2.new(1, -100, 1, 0)
+    txt.Position = UDim2.new(0, 34, 0, 0)
+    txt.BackgroundTransparency = 1
+    txt.Text = text
+    txt.Font = Enum.Font.GothamSemibold
+    txt.TextSize = 11
+    txt.TextColor3 = TH.Text
+    txt.TextXAlignment = Enum.TextXAlignment.Left
+    txt.Parent = card
+
+    local tbg = Instance.new("Frame")
+    tbg.Size = UDim2.new(0, 36, 0, 20)
+    tbg.Position = UDim2.new(1, -44, 0.5, -10)
+    tbg.BackgroundColor3 = TH.TOff
+    tbg.BorderSizePixel = 0
+    tbg.Parent = card
+    Corner(tbg, 10)
+
+    local knob = Instance.new("Frame")
+    knob.Size = UDim2.new(0, 14, 0, 14)
+    knob.Position = UDim2.new(0, 3, 0.5, -7)
+    knob.BackgroundColor3 = TH.KOff
+    knob.BorderSizePixel = 0
+    knob.Parent = tbg
+    Corner(knob, 7)
+
+    local active = false
+
+    local function Set(on)
+        active = on
+        TW(tbg, {BackgroundColor3 = on and TH.TOn or TH.TOff}, 0.25)
+        TW(knob, {Position = on and UDim2.new(1, -17, 0.5, -7) or UDim2.new(0, 3, 0.5, -7), BackgroundColor3 = on and TH.KOn or TH.KOff}, 0.25, Enum.EasingStyle.Back)
+        TW(cs, {Color = on and TH.Accent or TH.Border, Transparency = on and 0.3 or 0.7}, 0.25)
+    end
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 1, 0)
+    btn.BackgroundTransparency = 1
+    btn.Text = ""
+    btn.ZIndex = 2
+    btn.Parent = card
+
+    btn.MouseButton1Click:Connect(function()
+        local nw = not active
+        Set(nw)
+        if fn then fn(nw) end
+    end)
+
+    btn.MouseEnter:Connect(function() TW(card, {BackgroundColor3 = TH.CardH}, 0.12) end)
+    btn.MouseLeave:Connect(function() TW(card, {BackgroundColor3 = TH.Card}, 0.12) end)
+
+    return Set
+end
+
+local function ActionBtn(parent, text, emoji, order, fn)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(1, 0, 0, 38)
+    b.BackgroundColor3 = TH.Card
+    b.BorderSizePixel = 0
+    b.LayoutOrder = order
+    b.Text = ""
+    b.AutoButtonColor = false
+    b.Parent = parent
+    Corner(b, 9)
+
+    local l = Instance.new("TextLabel")
+    l.Size = UDim2.new(1, -14, 1, 0)
+    l.Position = UDim2.new(0, 9, 0, 0)
+    l.BackgroundTransparency = 1
+    l.Text = emoji.."  "..text
+    l.Font = Enum.Font.GothamSemibold
+    l.TextSize = 11
+    l.TextColor3 = TH.Text
+    l.TextXAlignment = Enum.TextXAlignment.Left
+    l.Parent = b
+
+    b.MouseEnter:Connect(function()
+        TW(b, {BackgroundColor3 = TH.Accent}, 0.15)
+        TW(l, {TextColor3 = TH.TextAct}, 0.15)
+    end)
+    b.MouseLeave:Connect(function()
+        TW(b, {BackgroundColor3 = TH.Card}, 0.15)
+        TW(l, {TextColor3 = TH.Text}, 0.15)
+    end)
+    b.MouseButton1Click:Connect(function()
+        if fn then fn() end
+    end)
+end
+
+-- ═══════════════════════════════════
+-- FITUR UTAMA (BADGE & NAME)
+-- ═══════════════════════════════════
+local BADGE = utf8.char(0xE000)
+local RealName = LP.Name
+local RealDisplay = LP.DisplayName
+local TargetName = ""
+local TargetDisplay = ""
+local ShowBadge = true
+
+local mainPage = Pages["Main"]
+
+Section(mainPage, "PROFILE CUSTOMIZATION", 1)
+
+local inputUser = TextInput(mainPage, "Username", "Enter real username...", 2)
+local inputDisplay = TextInput(mainPage, "Display Name", "Enter display name...", 3)
+
+-- Fitur Centang Biru
+local setBadge = Toggle(mainPage, "Verified Badge (Centang Biru)", "✓", 4, function(on) 
+    ShowBadge = on 
+end)
+setBadge(true)
+
+ActionBtn(mainPage, "Apply Changes", "🚀", 5, function()
+    TargetName = inputUser.Text
+    local rawD = inputDisplay.Text
+    local badgeText = ShowBadge and (" " .. BADGE) or ""
+    TargetDisplay = rawD .. badgeText
+    
+    if LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+        LP.Character:FindFirstChildOfClass("Humanoid").DisplayName = TargetDisplay
+    end
+    Notify("🚀 Applied!", "Name & Badge applied.", 3, TH.Good)
+end)
+
+ActionBtn(mainPage, "Reset to Real", "🔄", 6, function()
+    TargetName = ""
+    TargetDisplay = ""
+    if LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+        LP.Character:FindFirstChildOfClass("Humanoid").DisplayName = RealDisplay
+    end
+    Notify("🔄 Reset", "Restored to real name.", 3, TH.Bad)
+end)
+
+-- Logic Nge-ganti Nama
+local function spoof(obj)
+    if not obj:IsA("TextLabel") and not obj:IsA("TextButton") and not obj:IsA("TextBox") then return end
+    local text = obj.Text
+    if not text or text == "" or TargetName == "" then return end
+    if text == TargetDisplay or text == TargetName or text:find(TargetDisplay) then return end
+    local nt = text
+    if nt == RealDisplay then nt = TargetDisplay
+    elseif nt == RealName then nt = TargetName
+    else
+        if nt:find(RealDisplay) then nt = nt:gsub(RealDisplay, TargetDisplay) end
+        if nt:find(RealName) then nt = nt:gsub(RealName, TargetName) end
+    end
+    if nt ~= text then obj.Text = nt end
+end
+
+local function monitor(obj)
+    if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
+        spoof(obj)
+        obj:GetPropertyChangedSignal("Text"):Connect(function() spoof(obj) end)
+    end
+end
+
+pcall(function()
+    if LP:FindFirstChild("PlayerGui") then
+        for _, v in ipairs(LP.PlayerGui:GetDescendants()) do monitor(v) end
+        LP.PlayerGui.DescendantAdded:Connect(monitor)
+    end
+end)
+
+pcall(function()
+    for _, v in ipairs(CoreGui:GetDescendants()) do monitor(v) end
+    CoreGui.DescendantAdded:Connect(monitor)
+end)
+
+local function monitorChar(char)
+    local hum = char:WaitForChild("Humanoid", 10)
+    if hum and TargetDisplay ~= "" then
+        hum.DisplayName = TargetDisplay
+        hum:GetPropertyChangedSignal("DisplayName"):Connect(function()
+            if hum.DisplayName ~= TargetDisplay and TargetDisplay ~= "" then
+                hum.DisplayName = TargetDisplay
+            end
+        end)
+    end
+end
+
+if LP.Character then monitorChar(LP.Character) end
+LP.CharacterAdded:Connect(monitorChar)
+
+pcall(function()
+    local TCS = game:GetService("TextChatService")
+    if TCS.ChatVersion == Enum.ChatVersion.TextChatService then
+        TCS.OnIncomingMessage = function(message)
+            local props = Instance.new("TextChatMessageProperties")
+            if message.TextSource and message.TextSource.UserId == LP.UserId and TargetDisplay ~= "" then
+                props.PrefixText = TargetDisplay
+            end
+            return props
+        end
+    end
+end)
+
+-- ═══════════════════════════════════
+-- INFO TAB (WA COPY)
+-- ═══════════════════════════════════
+local infoPage = Pages["Info"]
+Section(infoPage, "ABOUT", 1)
+
+local infoCard = Instance.new("Frame")
+infoCard.Size = UDim2.new(1, 0, 0, 80)
+infoCard.BackgroundColor3 = TH.Card
+infoCard.BorderSizePixel = 0
+infoCard.LayoutOrder = 2
+infoCard.Parent = infoPage
+Corner(infoCard, 8)
+
+local infoTxt = Instance.new("TextLabel")
+infoTxt.Size = UDim2.new(1, -20, 1, 0)
+infoTxt.Position = UDim2.new(0, 10, 0, 0)
+infoTxt.BackgroundTransparency = 1
+infoTxt.Text = "VERIFIED SCRIPT - BY MARKBLOX\n\nCustomize your Username, Display Name, and Verified Badge. All changes are client-side only."
+infoTxt.Font = Enum.Font.Gotham
+infoTxt.TextSize = 10
+infoTxt.TextColor3 = TH.TextDim
+infoTxt.TextXAlignment = Enum.TextXAlignment.Left
+infoTxt.TextYAlignment = Enum.TextYAlignment.Center
+infoTxt.Parent = infoCard
+
+Section(infoPage, "SOCIAL MEDIA", 3)
+
+-- Tombol Copy WA
+ActionBtn(infoPage, "Copy WhatsApp Channel", "🟢", 4, function()
+    local success, err = pcall(function()
+        if setclipboard then
+            setclipboard(WA_LINK)
+        elseif toclipboard then
+            toclipboard(WA_LINK)
+        else
+            error("Executor tidak support copy text")
+        end
+    end)
+    
+    if success then
+        Notify("✅ Copied!", "WA Channel link copied to clipboard.", 3, TH.Good)
+    else
+        Notify("❌ Failed", "Your executor doesn't support clipboard.", 3, TH.Bad)
+    end
+end)
+
+-- ═══════════════════════════════════
+-- MINIMIZE & CLOSE
+-- ═══════════════════════════════════
+MinB.MouseButton1Click:Connect(function()
+    panelMin = not panelMin
+    local tH = panelMin and 48 or H
+    TW(Main, {Size = UDim2.new(0, W, 0, tH)}, 0.35, Enum.EasingStyle.Back)
+    MinB.Text = panelMin and "+" or "—"
+    if panelMin then
+        Content.Visible = false
+        TabFrame.Visible = false
+    else
+        task.delay(0.15, function()
+            Content.Visible = true
+            TabFrame.Visible = true
+        end)
+    end
+end)
+
+ClsB.MouseButton1Click:Connect(function()
+    TW(Main, {Position = UDim2.new(0.5, -W/2, 1, 50)}, 0.4, Enum.EasingStyle.Back)
+    task.delay(0.45, function() Gui:Destroy() end)
+end)
+
+-- ═══════════════════════════════════
+-- MOBILE TOGGLE & KEYS
+-- ═══════════════════════════════════
+if IsMobile then
+    local mob = Instance.new("TextButton")
+    mob.Size = UDim2.new(0, 44, 0, 44)
+    mob.Position = UDim2.new(1, -56, 0, 8)
+    mob.BackgroundColor3 = TH.Card
+    mob.BackgroundTransparency = 0.1
+    mob.Text = "☠️"
+    mob.Font = Enum.Font.GothamBold
+    mob.TextSize = 18
+    mob.TextColor3 = TH.Accent
+    mob.AutoButtonColor = false
+    mob.Active = true
+    mob.ZIndex = 100
+    mob.Parent = Gui
+    Corner(mob, 12)
+    Stroke(mob, 1, TH.Accent, 0.4)
+
+    local panelVis = true
+    mob.MouseButton1Click:Connect(function()
+        panelVis = not panelVis
+        Main.Visible = panelVis
+    end)
+end
+
+UIS.InputBegan:Connect(function(inp, gp)
+    if gp then return end
+    if inp.KeyCode == Enum.KeyCode.RightControl or inp.KeyCode == Enum.KeyCode.Backquote then
+        Main.Visible = not Main.Visible
+    end
+end)
+
+-- ═══════════════════════════════════
+-- OPENING ANIMATION
+-- ═══════════════════════════════════
+SwitchTab("Main")
+
+Main.Position = UDim2.new(0.5, -W/2, 1, 20)
+TW(Main, {Position = UDim2.new(0.5, -W/2, 0.5, -H/2)}, 0.7, Enum.EasingStyle.Back)
+
+task.delay(0.5, function()
+    Notify("☠️ Verified Script", "Features loaded successfully!", 4, TH.Accent)
+end)
+task.delay(1.5, function()
+    Notify("💡 Tip", "Drag title bar • CTRL/` to hide", 5, TH.AccDim)
+end)
+
+print("✅ Verified Script (SHADES UI) Loaded with Features!")
